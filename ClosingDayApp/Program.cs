@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace ClosingDayApp
@@ -11,7 +12,7 @@ namespace ClosingDayApp
             var regexForDate = @"^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$";
             Regex rg = new Regex(regexForDate);
 
-            var calendar = new Calendar(DateTime.Parse("2022-05-26"));
+            var calendar = new Calendar(DateTime.Parse("2022-05-26"), 5);
             string userInput;
 
 
@@ -48,22 +49,23 @@ namespace ClosingDayApp
         }
 
         public class Calendar {
-            public Calendar(DateTime closingDay) {
+            public Calendar(DateTime closingDay, double allowedSnowDays) {
                 ClosingDay = closingDay;
+                AllowedSnowDays = allowedSnowDays;
                 SnowDays = new List<SnowDay>();
             }
             public DateTime ClosingDay { get; set; }
             public List<SnowDay> SnowDays { get; set; }
+            public double AllowedSnowDays { get; set; }
 
             public DateTime GetFinalClosingDay() {
                 double snowDays = 0;
 
-                SnowDays.ForEach(snowDay =>
-                {
-                    snowDays += snowDay.IsFullDay ? 1 : 0.5;
+                snowDays = SnowDays.Sum(snowDay => { 
+                    return snowDay.IsFullDay ? 1 : 0.5;
                 });
 
-                double snowDaysDiff = snowDays - 5;
+                double snowDaysDiff = snowDays - AllowedSnowDays;
 
                 if (snowDaysDiff > 0)
                 {
@@ -79,6 +81,7 @@ namespace ClosingDayApp
         public class SnowDay { 
             public bool IsFullDay { get; set; }
             public DateTime OccurredOn { get; set; }
+            public double Days { get; set; }
         }
     }
 
