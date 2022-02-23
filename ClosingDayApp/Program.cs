@@ -61,6 +61,8 @@ namespace ClosingDayApp
             public DateTime GetFinalClosingDay() {
                 double snowDays = 0;
 
+
+                //using linq to sum snow days
                 snowDays = SnowDays.Sum(snowDay => { 
                     return snowDay.IsFullDay ? 1 : 0.5;
                 });
